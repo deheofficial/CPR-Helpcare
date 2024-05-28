@@ -11,16 +11,17 @@ background_subtractor = cv2.createBackgroundSubtractorMOG2(history=100, detectSh
 # Initialize movement counter and CPR rate counter
 movement_count = 0
 cpr_rate_counter = 0
+good_compress_count = 0  # Count of good compressions
 
 # Initialize variables for smooth transition
 target_color = [0, 255, 255]  # Initial color (Yellow)
 current_color = target_color.copy()
-transition_speed = 4  # Speed of color transition
+transition_speed = 7  # Speed of color transition
 
 # Initialize time for delaying rate updates and message persistence
 last_rate_update_time = time.time()
 rate_update_delay = 1  # Delay in seconds for updating rate
-message_persistence_time = 5  # Time in seconds to persist message and color
+message_persistence_time = 1.5  # Time in seconds to persist message and color
 last_message_change_time = time.time()
 
 # Initialize overlay_color and message outside the loop
@@ -34,7 +35,7 @@ total_cpr_count = 0
 while True:
     # Calculate elapsed time
     elapsed_time = int(time.time() - start_time)
-    seconds_remaining = 60 - elapsed_time
+    seconds_remaining = 15 - elapsed_time
 
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -66,6 +67,7 @@ while True:
         elif 600 <= rate <= 1900:
             message = "Good Compress"
             target_color = [0, 255, 0]  # Green
+            good_compress_count += 1  # Increment good compress count
         else:
             message = "Too Hard"
             target_color = [0, 0, 255]  # Red
@@ -81,8 +83,8 @@ while True:
             # Increment CPR counter by 1
             cpr_rate_counter += 1
 
-            # Increment total CPR count by the actual rate value divided by 500
-            total_cpr_count += rate / 500
+            # Increment total CPR count by the actual rate value divided by 600
+            total_cpr_count += round(rate / 600)
 
     # Smooth transition for overlay color change
     for i in range(3):
@@ -116,16 +118,17 @@ while True:
     cv2.imshow('CPR Rate Monitor', frame)
 
     # Check if time is up
-    if elapsed_time >= 60:
+    if elapsed_time >= 15:
         # Determine CPR efficiency based on total CPR count
-        if total_cpr_count < 81:
+        if total_cpr_count < 20:
             efficiency = "Inefficient CPR"
-        elif 81 <= total_cpr_count <= 90:
-            efficiency = "Best CPR"
+        elif 20 <= total_cpr_count <= 25:
+            efficiency = "Effective CPR"
         else:
             efficiency = "Vigorous CPR"
 
         print("Total CPR Count:", total_cpr_count)
+        print("Good Compress Count:", good_compress_count)
         print("CPR Efficiency:", efficiency)
         break
 
