@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPR Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cardiopulmonary Resuscitation (CPR) Guide</h1>
+        <div id="step-container">
+            <div class="step" id="step-1">
+                <h2>Step 1: Positioning Hands</h2>
+                <p>Place the heel of one hand on the center of the person's chest, on the lower half of the breastbone. Place the other hand on top and interlock your fingers.</p>
+                <button onclick="nextStep(2)">Next</button>
+            </div>
+            <div class="step" id="step-2" style="display: none;">
+                <h2>Step 2: Start Compressions</h2>
+                <p>Push hard and fast in the center of the chest at a rate of 100 to 120 compressions per minute. Allow the chest to rise completely between compressions.</p>
+                <button onclick="nextStep(1)">Previous</button>
+                <button onclick="nextStep(3)">Next</button>
+            </div>
+            <div class="step" id="step-3" style="display: none;">
+                <h2>Step 3: Provide Rescue Breaths</h2>
+                <p>If trained, give 2 rescue breaths after every 30 compressions. Tilt the person's head back, lift the chin, and give a breath while watching for the chest to rise.</p>
+                <button onclick="nextStep(2)">Previous</button>
+                <button onclick="nextStep(4)">Next</button>
+            </div>
+            <div class="step" id="step-4" style="display: none;">
+                <h2>Step 4: Continue CPR</h2>
+                <p>Continue cycles of 30 compressions and 2 breaths until help arrives or the person starts to breathe.</p>
+                <button onclick="nextStep(3)">Previous</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

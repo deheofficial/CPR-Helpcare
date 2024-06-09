@@ -3,26 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Movement Detection</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>CPR Guide</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        .container {
+            text-align: center;
+        }
+        #results-table {
+            margin: 0 auto; /* Center the table */
+            border-collapse: collapse;
+            width: 50%; /* Optional: Set the table width */
+            border: 1px solid black; /* Border for the table */
+        }
+        #results-table th, #results-table td {
+            padding: 10px;
+            border: 1px solid black; /* Border for table headers and cells */
+        }
+        #results-table th {
+            text-align: center; /* Center align the table headers */
+        }
+        #results-table td:first-child {
+            text-align: left; /* Left align the first column */
+        }
+        #results-table td:last-child {
+            text-align: right; /* Right align the second column */
+        }
+    </style>
 </head>
 <body>
-    <h1>Webcam Movement Detection</h1>
-    <div id="container">
-        <img id="webcam-feed" src="{{ url_for('video_feed') }}" width="640" height="480">
-        <p id="movement-count">Movement Count: Loading...</p>
+    <div class="container">
+        <h1>Cardiopulmonary Resuscitation (CPR) Demo App</h1>
+        <div id="step-container">
+            <div class="step" id="step-1" style="display: block;">
+                <h2>Step 1: Check Responsiveness</h2>
+                <img src="../static/images/step1.jpg" alt="Check Responsiveness" class="demo-image">
+                <p>Check if the person is responsive by tapping their shoulder and asking loudly, "Are you okay?"</p>
+                <button onclick="nextStep(2)">Next</button>
+            </div>
+            <div class="step" id="step-2">
+                <h2>Step 2: Open the Airway</h2>
+                <img src="../static/images/step2.jpg" alt="Open the Airway" class="demo-image">
+                <p>Tilt the head back and lift the chin to open the airway.</p>
+                <button onclick="nextStep(1)">Previous</button>
+                <button onclick="nextStep(3)">Next</button>
+            </div>
+            <div class="step" id="step-3">
+                <h2>Step 3: Check for Breathing</h2>
+                <img src="../static/images/step3.jpg" alt="Check for Breathing" class="demo-image">
+                <p>Look, listen, and feel for breathing for no more than 10 seconds.</p>
+                <button onclick="nextStep(2)">Previous</button>
+                <button onclick="nextStep(4)">Next</button>
+            </div>
+            <div class="step" id="step-4">
+                <h2>Step 4: Begin Chest Compressions</h2>
+                <img src="../static/images/step4.jpg" alt="Begin Chest Compressions" class="demo-image">
+                <p>Place your hands in the center of the chest and begin compressions at a rate of 100-120 per minute, pushing down at least 2 inches deep.</p>
+                <button onclick="nextStep(3)">Previous</button>
+                <button onclick="nextStep(5)">Next</button>
+            </div>
+            <div class="step" id="step-5">
+                <h2>Step 5: Using CPR-helpcare</h2>
+                <img src="../static/images/step5.jpg" alt="Using CPR-helpcare" class="demo-image">
+                <p>The CPR-helpcare app uses the camera to assist with CPR by providing real-time feedback.</p>
+                <button onclick="nextStep(4)">Previous</button>
+                <button onclick="runCPRHelpcare()">Run CPR-helpcare</button>
+            </div>
+        </div>
+        <div id="results-container" style="display: none;">
+            <h2>CPR-helpcare Results in 30 Seconds</h2>
+            <table id="results-table">
+                <tr>
+                    <th>Result</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Total CPR Count</td>
+                    <td id="total-cpr-count"></td>
+                </tr>
+                <tr>
+                    <td>Good Compress Count</td>
+                    <td id="good-compress-count"></td>
+                </tr>
+                <tr>
+                    <td>CPR Efficiency</td>
+                    <td id="cpr-efficiency"></td>
+                </tr>
+            </table>
+            <br>
+            <br>
+        </div>
     </div>
-
+    <script src="script.js"></script>
     <script>
-        // Function to update the movement count
-        function updateMovementCount() {
-            $.get("/movement_count", function(data) {
-                $("#movement-count").text("Movement Count: " + data);
-            });
+        function nextStep(step) {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((el) => (el.style.display = 'none'));
+            document.getElementById(`step-${step}`).style.display = 'block';
         }
 
-        // Update the movement count every 1 second
-        setInterval(updateMovementCount, 1000);
+        function runCPRHelpcare() {
+            fetch('/run_cpr_helpcare', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('results-container').style.display = 'block';
+                    document.getElementById('total-cpr-count').innerText = data.results.total_cpr_count;
+                    document.getElementById('good-compress-count').innerText = data.results.good_compress_count;
+                    document.getElementById('cpr-efficiency').innerText = data.results.cpr_efficiency;
+                } else {
+                    alert('Error executing CPR-helpcare script: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error);
+            });
+        }
     </script>
 </body>
 </html>
